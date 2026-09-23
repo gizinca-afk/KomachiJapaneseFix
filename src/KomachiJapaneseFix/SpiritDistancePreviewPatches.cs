@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection;
 using Godot;
 using HarmonyLib;
@@ -12,8 +13,10 @@ using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.addons.mega_text;
 using STS_Komachi_Onozuka.STS_Komachi_OnozukaCode.Patches;
 using STS_Komachi_Onozuka.STS_Komachi_OnozukaCode.Powers.Distance;
+using STS_Komachi_Onozuka.STS_Komachi_OnozukaCode.Powers.Abilities;
 using STS_Komachi_Onozuka.STS_Komachi_OnozukaCode.Powers.Spirits;
 
 namespace KomachiJapaneseFix;
@@ -26,6 +29,9 @@ public readonly record struct KomachiSpiritDistanceDamage(
 public static class KomachiSpiritDistancePreview
 {
     private readonly record struct DamageSource(Creature Target, Creature? Dealer, decimal BaseDamage);
+
+    public static Color GetPreviewColor(bool isCurrentDistance) =>
+        KomachiAttackDistancePreview.GetPreviewColor(isCurrentDistance);
 
     // Resolve private fields only when a target has no DistancePower. An API
     // change here must not break hovering unrelated power icons.
@@ -246,6 +252,11 @@ internal static class KomachiSpiritDistanceHoverController
 
             state.Cluster = KomachiDistancePreviewOverlay.AddAboveTarget(
                 targetNode, preview.DamageByLevel, preview.CurrentLevel);
+            foreach (Label label in state.Cluster.GetChildren().OfType<Label>())
+            {
+                label.Modulate = KomachiSpiritDistancePreview.GetPreviewColor(
+                    label.Modulate == StsColors.red);
+            }
         }
         catch (Exception ex)
         {
@@ -264,6 +275,42 @@ internal static class KomachiSpiritDistanceHoverController
         state.Cluster = null;
     }
 
+}
+
+// The original mod draws its third damage amount in red on the power icon.
+// Its floating label may be reparented while raised, so use the controller's
+// model-keyed label rather than searching only under the NPower node.
+[HarmonyPatch]
+internal static class KomachiSpiritDamageIconColorPatch
+{
+    private static readonly Type ControllerType =
+        typeof(GuidedSpiritPower).Assembly.GetType(
+            "STS_Komachi_Onozuka.STS_Komachi_OnozukaCode.Patches.PowerPatches.ThirdAmountFloatingLabelController",
+            throwOnError: true)!;
+
+    private static readonly FieldInfo LabelsField =
+        AccessTools.Field(ControllerType, "_labels")
+        ?? throw new MissingFieldException(ControllerType.FullName, "_labels");
+
+    [HarmonyTargetMethod]
+    private static MethodBase TargetMethod() =>
+        AccessTools.Method(ControllerType, "Refresh")
+        ?? throw new MissingMethodException(ControllerType.FullName, "Refresh");
+
+    [HarmonyPostfix]
+    private static void Postfix(NPower powerNode)
+    {
+        if (powerNode.Model is not (GuidedSpiritPower or VengefulSpiritPower or LonelyBoundSpiritPower)
+            || LabelsField.GetValue(null) is not IDictionary labels
+            || labels[powerNode.Model] is not MegaLabel label
+            || !GodotObject.IsInstanceValid(label))
+        {
+            return;
+        }
+
+        label.AddThemeColorOverride(ThemeConstants.Label.FontColor,
+            KomachiSpiritDistancePreview.GetPreviewColor(isCurrentDistance: true));
+    }
 }
 
 [HarmonyPatch(typeof(NPower), "OnHovered")]

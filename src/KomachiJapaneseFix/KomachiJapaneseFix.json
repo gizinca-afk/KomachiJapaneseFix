@@ -3,7 +3,7 @@
   "name": "小野塚小町 日本語・挙動修正",
   "author": "Local compatibility fix",
   "description": "Komachi Onozuka v0.2.2用の日本語・挙動修正。元MODは変更しません。OFFにして再起動すると元の状態へ戻ります。public-beta v0.111.0用。",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "has_pck": false,
   "has_dll": true,
   "min_game_version": "0.111.0",

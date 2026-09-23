@@ -7,7 +7,7 @@ namespace KomachiJapaneseFix;
 [ModInitializer(nameof(Initialize))]
 public static class MainFile
 {
-    public const string Version = "0.2.16";
+    public const string Version = "0.2.17";
 
     public static void Initialize()
     {

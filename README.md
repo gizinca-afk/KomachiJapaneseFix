@@ -1,6 +1,6 @@
 # KomachiJapaneseFix
 
-Source code and Japanese localization for the unofficial [The Ferryman / Komachi Onozuka Japanese fix](https://steamcommunity.com/sharedfiles/filedetails/?id=3806241141) for Slay the Spire 2. The source here is version 0.2.16, including an unreleased magenta attack-damage preview; the linked Workshop item is currently version 0.2.15. Both target the original Komachi mod version 0.2.2 on the game's `public-beta` branch.
+Source code and Japanese localization for the unofficial [The Ferryman / Komachi Onozuka Japanese fix](https://steamcommunity.com/sharedfiles/filedetails/?id=3806241141) for Slay the Spire 2. The source and linked Workshop item are version 0.2.17. Both target the original Komachi mod version 0.2.2 on the game's `public-beta` branch. This release displays attack and spirit distance-damage previews, including spirit-icon damage numbers, in magenta.
 
 This is an add-on, not a copy of the original mod. The original mod, Slay the Spire 2, BaseLib, and MinionLib are required at runtime and are **not** included here. Install the playable version through the linked Steam Workshop item.
 
@@ -30,4 +30,4 @@ The original mod is by Valon. This add-on and its Japanese localization are by g
 
 ## 日本語
 
-本リポジトリは、Slay the Spire 2 の小町MOD向け追加修正版 v0.2.16 のC#ソースと日本語訳を閲覧するためのものです。v0.2.16の赤紫色のアタックダメージ予測は、現時点でWorkshop未公開です。元MOD・ゲーム・依存MODのDLLや、再配布可否を確認できていない画像は含めていません。プレイには上記Workshop版を使用してください。公開されていること自体を、第三者素材の再利用許諾とは扱わないでください。
+本リポジトリは、Slay the Spire 2 の小町MOD向け追加修正版 v0.2.17 のC#ソースと日本語訳を閲覧するためのものです。アタックと霊の間合い別ダメージ、霊アイコン横のダメージ値を赤紫で表示する版をWorkshopにも公開しています。元MOD・ゲーム・依存MODのDLLや、再配布可否を確認できていない画像は含めていません。プレイには上記Workshop版を使用してください。公開されていること自体を、第三者素材の再利用許諾とは扱わないでください。
