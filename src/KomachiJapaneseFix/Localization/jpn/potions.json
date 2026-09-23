@@ -1,0 +1,14 @@
+{
+  "STS_KOMACHI_ONOZUKA-GUIDED_SPIRIT_POTION.title": "誘導霊の壺",
+  "STS_KOMACHI_ONOZUKA-GUIDED_SPIRIT_POTION.description": "[gold]誘導霊[/gold]{GuidedSpiritPower}を得る。",
+  "STS_KOMACHI_ONOZUKA-VENGEFUL_SPIRIT_POTION.title": "怨念の壺",
+  "STS_KOMACHI_ONOZUKA-VENGEFUL_SPIRIT_POTION.description": "[gold]怨霊[/gold]{VengefulSpiritPower}を付与する。",
+  "STS_KOMACHI_ONOZUKA-DIVINE_SPIRIT_POTION.title": "神霊の壺",
+  "STS_KOMACHI_ONOZUKA-DIVINE_SPIRIT_POTION.description": "[gold]神霊[/gold]{DivineSpiritPower}を得る。",
+  "STS_KOMACHI_ONOZUKA-SPIDER_LILY_POTION.title": "瓶詰めの彼岸花",
+  "STS_KOMACHI_ONOZUKA-SPIDER_LILY_POTION.description": "[gold]彼岸花[/gold]を{Cards}枚手札に加える。",
+  "STS_KOMACHI_ONOZUKA-LILY_WHITE_POTION.title": "瓶詰めのリリーホワイト",
+  "STS_KOMACHI_ONOZUKA-LILY_WHITE_POTION.description": "最大HPの{Heal}%を回復し、{Energy:energyIcons()}を得る。",
+  "STS_KOMACHI_ONOZUKA-DISPLACEMENT_POTION.title": "間合いのポーション",
+  "STS_KOMACHI_ONOZUKA-DISPLACEMENT_POTION.description": "[gold]距離操作[/gold]を{Cards}枚手札に加える。"
+}

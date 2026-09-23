@@ -1,0 +1,20 @@
+{
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.aromaPrinciple": "[red]死者の魂にも……休息は必要さ。[/red]",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.banter.alive.endTurnPing": "終わったら、昼寝から起こしておくれよ。",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.banter.dead.endTurnPing": "すやすや……",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.cardsModifierDescription": "渡し守のカードが報酬とショップに出現するようになる。",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.cardsModifierTitle": "渡し守のカード",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.description": "三途の川を案内する死神。\n仕事をさぼっていない時は、距離と霊を操る。",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.eventDeathPrevention": "あたいは死神だよ。死ぬもんか！",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.goldMonologue": "[sine]こいつは良い弾幕になりそうだ！[/sine]",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.possessiveAdjective": "小町の",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.pronounObject": "小町",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.pronounPossessive": "小町のもの",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.pronounSubject": "小町",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.title": "渡し守",
+  "STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.titleObject": "渡し守",
+  "THE_ARCHITECT.talk.STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.0-0r.char": "設計者には腹が立つね。",
+  "THE_ARCHITECT.talk.STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.0-0r.next": "続ける",
+  "THE_ARCHITECT.talk.STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.0-1r.ancient": "死んでもらう。",
+  "THE_ARCHITECT.talk.STS_KOMACHI_ONOZUKA-KOMACHI_CHARACTER.0-attack": "Both"
+}

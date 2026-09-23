@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.2.16</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="sts2"><HintPath>$(STS2_GAME_DIR)/data_sts2_windows_x86_64/sts2.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="GodotSharp"><HintPath>$(STS2_GAME_DIR)/data_sts2_windows_x86_64/GodotSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(STS2_GAME_DIR)/data_sts2_windows_x86_64/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BaseLib"><HintPath>$(STS2_WORKSHOP_DIR)/3737335127/BaseLib/BaseLib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MinionLib"><HintPath>$(STS2_WORKSHOP_DIR)/3747595039/MinionLib/MinionLib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="STS_Komachi_Onozuka"><HintPath>$(STS2_WORKSHOP_DIR)/3765485950/STS_Komachi_Onozuka.dll</HintPath><Private>false</Private></Reference>
+    <EmbeddedResource Include="Localization/jpn/*.json" />
+    <EmbeddedResource Include="Assets/*.png" />
+    <None Include="KomachiJapaneseFix.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

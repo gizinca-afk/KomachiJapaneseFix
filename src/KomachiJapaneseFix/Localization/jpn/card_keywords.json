@@ -1,0 +1,16 @@
+{
+  "STS_KOMACHI_ONOZUKA-DETONATE.title": "起爆",
+  "STS_KOMACHI_ONOZUKA-DETONATE.description": "敵の[gold]霊[/gold]をすべて取り除き、それぞれのダメージを与える。",
+  "STS_KOMACHI_ONOZUKA-RELEASE.title": "解放X",
+  "STS_KOMACHI_ONOZUKA-RELEASE.description": "プレイ前から持つ[gold]誘導霊[/gold]と[gold]神霊[/gold]を合計X体まで任意で消費する。[gold]誘導霊[/gold]から消費する。",
+  "STS_KOMACHI_ONOZUKA-BARRIER.title": "障壁X",
+  "STS_KOMACHI_ONOZUKA-BARRIER.description": "HP Xの[gold]神霊[/gold]を召喚する。召喚済みなら最大HPと現在HPをX増やす。",
+  "STS_KOMACHI_ONOZUKA-DISPLACE.title": "間合い変更",
+  "STS_KOMACHI_ONOZUKA-DISPLACE.description": "敵の[gold]間合い[/gold]を変える。[gold]間合い[/gold]を変える処理はすべて「間合い変更」として扱う。",
+  "STS_KOMACHI_ONOZUKA-CLONE.title": "クローン",
+  "STS_KOMACHI_ONOZUKA-CLONE.description": "[gold]クローン[/gold]を持つカードから、さらに[gold]クローン[/gold]を作ることはできない。「コピー」とは別の効果。",
+  "STS_KOMACHI_ONOZUKA-UNCLONABLE.title": "複製不可",
+  "STS_KOMACHI_ONOZUKA-UNCLONABLE.description": "このカードの[gold]クローン[/gold]は作れない。",
+  "STS_KOMACHI_ONOZUKA-REPLENISH.title": "補充",
+  "STS_KOMACHI_ONOZUKA-REPLENISH.description": "このカードを引くたび、カードを1枚引く。"
+}

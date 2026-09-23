@@ -1,0 +1,9 @@
+{
+  "STS_KOMACHI_ONOZUKA.mod_title": "渡し守（小町）",
+  "STS_KOMACHI_ONOZUKA-USE_DAIRI_PORTRAIT.title": "dairi氏の立ち絵を使う",
+  "STS_KOMACHI_ONOZUKA-USE_DAIRI_PORTRAIT.hover.title": "戦闘中にdairi氏の立ち絵を使う",
+  "STS_KOMACHI_ONOZUKA-USE_DAIRI_PORTRAIT.hover.desc": "戦闘中の通常モデルを、dairi氏の小町の立ち絵へ置き換える。",
+  "STS_KOMACHI_ONOZUKA-SKIP_DANMAKU.title": "攻撃・弾幕アニメーションを省略",
+  "STS_KOMACHI_ONOZUKA-SKIP_DANMAKU.hover.title": "攻撃・弾幕アニメーションを省略",
+  "STS_KOMACHI_ONOZUKA-SKIP_DANMAKU.hover.desc": "一部カードの弾幕アニメーションを省略する。"
+}
