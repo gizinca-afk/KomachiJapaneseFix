@@ -28,6 +28,12 @@ public static class KomachiAttackDistancePreview
     public static Color GetPreviewColor(bool isCurrentDistance) =>
         Color.FromHtml(isCurrentDistance ? "ff3b9d" : "ffa4d6");
 
+    public static bool IsSupportedTargetType(TargetType targetType) =>
+        targetType is TargetType.AnyEnemy or TargetType.AllEnemies;
+
+    public static int GetDamageDistanceLevel(int initialLevel, int displacement) =>
+        Math.Clamp(initialLevel + displacement, DistancePower.MinLevel, DistancePower.MaxLevel);
+
     private static readonly FieldInfo PowerOwnerField =
         AccessTools.Field(typeof(PowerModel), "_owner")
         ?? throw new MissingFieldException(typeof(PowerModel).FullName, "_owner");
@@ -43,14 +49,17 @@ public static class KomachiAttackDistancePreview
     public static bool IsSupportedCard(CardModel? card) =>
         card is STS_Komachi_OnozukaCard
         && card.Type == CardType.Attack
-        && card.TargetType == TargetType.AnyEnemy
+        && IsSupportedTargetType(card.TargetType)
         && card.Pile?.Type == PileType.Hand
         && card.CombatState is not null
         && GetDamageVar(card) is not null;
 
     public static KomachiAttackDistanceDamage? Preview(CardModel card, Creature target)
     {
-        if (!IsSupportedCard(card) || !card.IsValidTarget(target))
+        if (!IsSupportedCard(card)
+            || (card.TargetType == TargetType.AnyEnemy
+                ? !card.IsValidTarget(target)
+                : !card.CombatState!.HittableEnemies.Contains(target)))
         {
             return null;
         }
@@ -59,6 +68,9 @@ public static class KomachiAttackDistancePreview
         DynamicVar damageVar = GetDamageVar(card)!;
         int currentLevel = Math.Clamp(
             DistancePower.GetLevel(target), DistancePower.MinLevel, DistancePower.MaxLevel);
+        // Sweep moves every enemy before its attack. The labels still describe
+        // the enemy's starting distance, while the damage uses the new one.
+        int preAttackDisplacement = card is Sweep sweep ? sweep.Value1 : 0;
         DistancePower? distance = target.GetPower<DistancePower>();
         List<PowerModel>? powers = null;
         decimal actualDefaultDamage = 0m;
@@ -85,13 +97,14 @@ public static class KomachiAttackDistancePreview
         {
             for (int level = DistancePower.MinLevel; level <= DistancePower.MaxLevel; level++)
             {
-                if (powers is not null && level == DistancePower.DefaultLevel)
+                int damageLevel = GetDamageDistanceLevel(level, preAttackDisplacement);
+                if (powers is not null && damageLevel == DistancePower.DefaultLevel)
                 {
                     byLevel[level] = KomachiSpiritDamagePreview.ToDisplayedDamage(actualDefaultDamage);
                     continue;
                 }
 
-                previewDistance.PreviewAmountOverride = level;
+                previewDistance.PreviewAmountOverride = damageLevel;
                 RefreshCardPreview(card, target, vars);
                 byLevel[level] = KomachiSpiritDamagePreview.ToDisplayedDamage(damageVar.PreviewValue);
             }
@@ -172,11 +185,12 @@ internal static class KomachiDistancePreviewOverlay
 
 internal static class KomachiAttackDistancePreviewController
 {
-    private sealed class PreviewState(NCard card, Creature target)
+    private sealed class PreviewState(NCard card)
     {
-        internal Creature Target { get; set; } = target;
+        internal Creature? Target { get; set; }
+        internal bool IsMultiTarget { get; set; }
         internal Action<CombatState> OnStateChanged { get; } = _ => Refresh(card);
-        internal NEnemyIntentDistanceCluster? Cluster { get; set; }
+        internal List<NEnemyIntentDistanceCluster> Clusters { get; } = [];
     }
 
     private static readonly Dictionary<NCard, PreviewState> Active = [];
@@ -184,25 +198,56 @@ internal static class KomachiAttackDistancePreviewController
 
     internal static void OnPreviewTargetChanged(NCard card, Creature? target)
     {
+        // All-enemy cards are driven by Show/HideMultiCreatureTargetingVisuals.
+        // With one enemy, the game also sets a normal preview target; ignore it
+        // so that it cannot create a duplicate row or clear the multi preview.
+        if (card.Model?.TargetType == TargetType.AllEnemies)
+        {
+            return;
+        }
+
         if (target is null || !KomachiAttackDistancePreview.IsSupportedCard(card.Model))
         {
             Hide(card);
             return;
         }
 
-        if (!Active.TryGetValue(card, out PreviewState? state))
-        {
-            state = new PreviewState(card, target);
-            Active.Add(card, state);
-            CombatManager.Instance.StateTracker.CombatStateChanged += state.OnStateChanged;
-            if (!_combatEndedSubscribed)
-            {
-                CombatManager.Instance.CombatEnded += OnCombatEnded;
-                _combatEndedSubscribed = true;
-            }
-        }
+        PreviewState state = GetOrCreateState(card);
+        state.IsMultiTarget = false;
         state.Target = target;
         Refresh(card);
+    }
+
+    internal static void OnMultiTargetPreviewRequested(NCard card)
+    {
+        if (card.Model is not { TargetType: TargetType.AllEnemies } model
+            || !KomachiAttackDistancePreview.IsSupportedCard(model))
+        {
+            return;
+        }
+
+        PreviewState state = GetOrCreateState(card);
+        state.IsMultiTarget = true;
+        state.Target = null;
+        Refresh(card);
+    }
+
+    private static PreviewState GetOrCreateState(NCard card)
+    {
+        if (Active.TryGetValue(card, out PreviewState? state))
+        {
+            return state;
+        }
+
+        state = new PreviewState(card);
+        Active.Add(card, state);
+        CombatManager.Instance.StateTracker.CombatStateChanged += state.OnStateChanged;
+        if (!_combatEndedSubscribed)
+        {
+            CombatManager.Instance.CombatEnded += OnCombatEnded;
+            _combatEndedSubscribed = true;
+        }
+        return state;
     }
 
     internal static void Hide(NCard card)
@@ -213,11 +258,19 @@ internal static class KomachiAttackDistancePreviewController
         }
 
         CombatManager.Instance.StateTracker.CombatStateChanged -= state.OnStateChanged;
-        ClearCluster(state);
+        ClearClusters(state);
         if (Active.Count == 0 && _combatEndedSubscribed)
         {
             CombatManager.Instance.CombatEnded -= OnCombatEnded;
             _combatEndedSubscribed = false;
+        }
+    }
+
+    internal static void HideMultiTarget(NCard card)
+    {
+        if (Active.TryGetValue(card, out PreviewState? state) && state.IsMultiTarget)
+        {
+            Hide(card);
         }
     }
 
@@ -236,7 +289,7 @@ internal static class KomachiAttackDistancePreviewController
             return;
         }
 
-        ClearCluster(state);
+        ClearClusters(state);
         if (!GodotObject.IsInstanceValid(card)
             || !card.IsInsideTree()
             || NCombatRoom.Instance is not { } room)
@@ -246,20 +299,48 @@ internal static class KomachiAttackDistancePreviewController
 
         try
         {
-            if (card.Model is not { } model
-                || KomachiAttackDistancePreview.Preview(model, state.Target) is not { } preview
-                || room.GetCreatureNode(state.Target) is not { } targetNode)
+            if (card.Model is not { } model || !KomachiAttackDistancePreview.IsSupportedCard(model))
             {
                 return;
             }
 
-            state.Cluster = KomachiDistancePreviewOverlay.AddAboveTarget(
-                targetNode, preview.DamageByLevel, preview.CurrentLevel);
-            state.Cluster.Name = "KomachiAttackDistancePreview";
-            foreach (Label label in state.Cluster.GetChildren().OfType<Label>())
+            IReadOnlyList<Creature> targets = state.IsMultiTarget
+                ? model.CombatState!.HittableEnemies
+                : state.Target is { } singleTarget ? [singleTarget] : [];
+            try
             {
-                label.Modulate = KomachiAttackDistancePreview.GetPreviewColor(
-                    label.Modulate == StsColors.red);
+                foreach (Creature target in targets)
+                {
+                    if (KomachiAttackDistancePreview.Preview(model, target) is not { } preview
+                        || room.GetCreatureNode(target) is not { } targetNode)
+                    {
+                        continue;
+                    }
+
+                    NEnemyIntentDistanceCluster cluster = KomachiDistancePreviewOverlay.AddAboveTarget(
+                        targetNode, preview.DamageByLevel, preview.CurrentLevel);
+                    state.Clusters.Add(cluster);
+                    cluster.Name = "KomachiAttackDistancePreview";
+                    foreach (Label label in cluster.GetChildren().OfType<Label>())
+                    {
+                        label.Modulate = KomachiAttackDistancePreview.GetPreviewColor(
+                            label.Modulate == StsColors.red);
+                    }
+                }
+            }
+            finally
+            {
+                if (state.IsMultiTarget)
+                {
+                    // Previewing the enemies one at a time must not leave the
+                    // card's dynamic values pointing at the last enemy.
+                    model.DynamicVars.ClearPreview();
+                    Creature? originalTarget = targets.Count == 1
+                        ? targets[0]
+                        : model.CurrentTarget;
+                    model.UpdateDynamicVarPreview(
+                        CardPreviewMode.MultiCreatureTargeting, originalTarget, model.DynamicVars);
+                }
             }
         }
         catch (Exception ex)
@@ -269,13 +350,16 @@ internal static class KomachiAttackDistancePreviewController
         }
     }
 
-    private static void ClearCluster(PreviewState state)
+    private static void ClearClusters(PreviewState state)
     {
-        if (state.Cluster is { } cluster && GodotObject.IsInstanceValid(cluster))
+        foreach (NEnemyIntentDistanceCluster cluster in state.Clusters)
         {
-            cluster.QueueFree();
+            if (GodotObject.IsInstanceValid(cluster))
+            {
+                cluster.QueueFree();
+            }
         }
-        state.Cluster = null;
+        state.Clusters.Clear();
     }
 
 }

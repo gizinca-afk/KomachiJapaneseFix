@@ -535,6 +535,7 @@ internal static class KomachiDistanceCardMultiIntentPreviewPatch
         if (__instance.Holder?.CardNode is { } card)
         {
             KomachiTargetedIntentPreviewController.OnMultiTargetPreviewRequested(card);
+            KomachiAttackDistancePreviewController.OnMultiTargetPreviewRequested(card);
         }
     }
 }
@@ -548,6 +549,7 @@ internal static class KomachiDistanceCardMultiIntentPreviewCleanupPatch
         if (__instance.Holder?.CardNode is { } card)
         {
             KomachiTargetedIntentPreviewController.Clear(card);
+            KomachiAttackDistancePreviewController.HideMultiTarget(card);
         }
     }
 }
@@ -556,8 +558,11 @@ internal static class KomachiDistanceCardMultiIntentPreviewCleanupPatch
 internal static class KomachiDistanceCardIntentPreviewPoolCleanupPatch
 {
     [HarmonyPostfix]
-    private static void ClearTargetIntentDamage(NCard __instance) =>
+    private static void ClearTargetIntentDamage(NCard __instance)
+    {
         KomachiTargetedIntentPreviewController.Clear(__instance);
+        KomachiAttackDistancePreviewController.Hide(__instance);
+    }
 }
 
 [HarmonyPatch(typeof(NCard), "_ExitTree")]

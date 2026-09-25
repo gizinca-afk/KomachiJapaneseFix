@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -35,9 +36,8 @@ namespace KomachiJapaneseFix;
 
 public static class KomachiCombatPileInspectCards
 {
-    public static IReadOnlyList<CardModel> CreateSnapshot(
-        IReadOnlyList<CardModel> cards, Func<CardModel, bool>? filter) =>
-        filter is null ? cards.ToList() : cards.Where(filter).ToList();
+    public static IReadOnlyList<CardModel> CreateSnapshot(IReadOnlyList<CardModel> displayedCards) =>
+        displayedCards.ToList();
 }
 
 [HarmonyPatch(typeof(NCombatPileCardSelectScreen), "UpdatePileContents")]
@@ -51,9 +51,13 @@ internal static class KomachiCombatPileInspectCardListPatch
         AccessTools.Field(typeof(NCombatPileCardSelectScreen), "_pile")
         ?? throw new MissingFieldException(typeof(NCombatPileCardSelectScreen).FullName, "_pile");
 
-    private static readonly FieldInfo FilterField =
-        AccessTools.Field(typeof(NCombatPileCardSelectScreen), "_filter")
-        ?? throw new MissingFieldException(typeof(NCombatPileCardSelectScreen).FullName, "_filter");
+    private static readonly FieldInfo GridField =
+        AccessTools.Field(typeof(NCardGridSelectionScreen), "_grid")
+        ?? throw new MissingFieldException(typeof(NCardGridSelectionScreen).FullName, "_grid");
+
+    private static readonly FieldInfo GridCardsField =
+        AccessTools.Field(typeof(NCardGrid), "_cards")
+        ?? throw new MissingFieldException(typeof(NCardGrid).FullName, "_cards");
 
     [HarmonyPostfix]
     private static void SyncInspectCards(NCombatPileCardSelectScreen __instance)
@@ -63,9 +67,14 @@ internal static class KomachiCombatPileInspectCardListPatch
             || pile.Cards[0].Owner.Character is not Komachi_Character)
             return;
 
-        var filter = FilterField.GetValue(__instance) as Func<CardModel, bool>;
+        // SetCards has already applied the game's filtering and display sorting.
+        // Use its complete list, not the draw pile's real order or only visible rows.
+        if (GridField.GetValue(__instance) is not NCardGrid grid
+            || GridCardsField.GetValue(grid) is not IReadOnlyList<CardModel> sortedGridCards)
+            return;
+
         CardsField.SetValue(__instance,
-            KomachiCombatPileInspectCards.CreateSnapshot(pile.Cards, filter));
+            KomachiCombatPileInspectCards.CreateSnapshot(sortedGridCards));
     }
 }
 
